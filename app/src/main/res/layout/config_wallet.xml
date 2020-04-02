@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="请输入钱包名称："
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/config_wallet_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="10字以内"
+        android:inputType="textPersonName" />
+
+    <Switch
+        android:id="@+id/config_wallet_network"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOff="0"
+        android:textOn="1"
+        android:text="是否使用TestNet"
+        android:checked="false"
+        />
+
+    <Switch
+        android:id="@+id/config_wallet_mulsig"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="是否使用多重签名"
+        android:textOff="0"
+        android:textOn="1"
+        android:checked="false"
+     />
+
+    <Button
+        android:id="@+id/config_creat_wallet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Creat Wallet" />
+
+</LinearLayout>
