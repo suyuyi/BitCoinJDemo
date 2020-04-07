@@ -10,7 +10,9 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.kits.WalletAppKit;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
+import org.bitcoinj.wallet.DeterministicSeed;
 import org.bitcoinj.wallet.SendRequest;
+import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 
 import java.io.File;
@@ -52,12 +54,24 @@ public class single<onStop> extends AppCompatActivity{
     protected long time_distance;
     private AlertDialog.Builder builder;
     private ProgressDialog progressDialog;
+    protected String mode;
+    protected DeterministicSeed restore_seed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent creat_single= getIntent();
-        wallet_name=creat_single.getStringExtra("name");
-        if(Integer.valueOf(creat_single.getStringExtra("testnet"))==1)
+        Intent single= getIntent();
+        wallet_name=single.getStringExtra("name");
+        mode=single.getStringExtra("mode");
+        if(mode.contains("restore"))
+        {
+            try
+            {
+                restore_seed=new DeterministicSeed(single.getStringExtra("word"),null,"",Long.valueOf(single.getStringExtra("time")));
+            } catch (UnreadableWalletException e) {
+                e.printStackTrace();
+            }
+        }
+        if(Integer.valueOf(single.getStringExtra("testnet"))==1)
             network=TestNet3Params.get();
         else
             network=MainNetParams.get();
@@ -67,15 +81,17 @@ public class single<onStop> extends AppCompatActivity{
 //        else
 //            network= TestNet3Params.get();
         setContentView(R.layout.activity_single);
-        start_wallet(wallet_name,network);
+        start_wallet(wallet_name,network,mode);
         init_view();
         init_window();
     }
-    private void start_wallet(String name,NetworkParameters network){
+    private void start_wallet(String name,NetworkParameters network,String mode){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 kit = new WalletAppKit(network, new File(getCacheDir()+""), name);
+                if(mode.contains("restore"))
+                    kit.restoreWalletFromSeed(restore_seed);
                 kit.startAsync();
                 kit.awaitRunning();
             }
@@ -295,6 +311,7 @@ public class single<onStop> extends AppCompatActivity{
         builder.create().show();
     }
     private void show_str_seed() {
+        Log.i("seed_info","助记词:"+kit.wallet().getKeyChainSeed().getMnemonicCode().toString()+"\n时间盐:"+String.valueOf(kit.wallet().getKeyChainSeed().getCreationTimeSeconds()));
         builder = new AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle("请勿向他人展示助记词")
                 .setMessage("助记词:"+kit.wallet().getKeyChainSeed().getMnemonicCode().toString()+"\n时间盐:"+String.valueOf(kit.wallet().getKeyChainSeed().getCreationTimeSeconds()))
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {

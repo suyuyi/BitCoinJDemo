@@ -1,0 +1,5 @@
+{
+  "wallet_info": [
+    {"name": "test_test_multi","key_cnt": "3","threshold": "2"}
+  ]
+}

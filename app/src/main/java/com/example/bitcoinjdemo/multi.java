@@ -1,11 +1,13 @@
 package com.example.bitcoinjdemo;
 
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,8 +54,8 @@ public class multi extends AppCompatActivity {
     protected String wallet_name;
     protected Button send,refresh;
     protected TextView show_window;
-    protected DeterministicKeyChain key_one,key_two;
-    protected DeterministicSeed seed_one,seed_two,seed_m;
+    protected DeterministicKeyChain key_one,key_two,key3,key4,key5,key6;
+    protected DeterministicSeed seed_one,seed_two,seed3,seed4,seed5,seed6,seed_m;
     protected MarriedKeyChain m;
     protected TransactionSigner cus;
     protected Address rece_addr;
@@ -62,7 +64,7 @@ public class multi extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mul);
         init_key();
-        start_wallet("mul_test1", TestNet3Params.get());
+        start_wallet("mul_test", TestNet3Params.get());
         init_window();
     }
     protected void init_window(){
@@ -73,11 +75,31 @@ public class multi extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try{
+                    Log.i("wallet_info",kit.wallet().getActiveKeyChain().toString());
+//                DeterministicKeyChain k;
 //                Log.i("mul_mess","Signer_num:"+String.valueOf(kit.wallet().getTransactionSigners().size()));
 //                print_redeemdata();
-//                print_Unspent();
-                Log.i("wallet_info",kit.wallet().toString());
-                Log.i("wallet_info",kit.wallet().getTransactionsByTime().toString());
+                    print_Unspent();
+                    Log.i("wallet_info",kit.wallet().toString());
+                    Log.i("wallet_info",kit.wallet().getTransactionsByTime().toString());
+                    Log.i("key_info","seed_word:"+kit.wallet().getActiveKeyChain().getSeed().getMnemonicCode().toString()+
+                            "\nseed_time:"+kit.wallet().getActiveKeyChain().getSeed().getCreationTimeSeconds());
+                }
+                catch(Exception e)
+                {
+                    Toast toast = Toast.makeText(multi.this,"钱包尚未加载完成",Toast.LENGTH_LONG);
+                    toast.show();
+                    e.printStackTrace();
+                }
+
+//                show_window.setText(kit.wallet().getLastBlockSeenTime().toString());
+//                DeterministicKeyChain t_kyc=DeterministicKeyChain.builder().random(new SecureRandom()).build();
+//                Log.i("key_info","seed_word:"+t_kyc.getSeed().getMnemonicCode().toString()+"\nseed_time:"+t_kyc.getSeed().getCreationTimeSeconds());
+//                Log.i("key_info","t_kcy:"+t_kyc.getWatchingKey().toString());
+//                DeterministicKey t=DeterministicKey.deserializeB58(t_kyc.getWatchingKey().serializePrivB58(TestNet3Params.get()),TestNet3Params.get());
+//                Log.i("key_info","t:"+t.toString());
+
             }
         });
 //        Output.getScriptPubKey().toString():HASH160 PUSHDATA(20)[c8b50c9a5769a230717f0ae17bec19beb362898a] EQUAL
@@ -101,8 +123,8 @@ public class multi extends AppCompatActivity {
                     Log.i("sendrequest_info","spent_value:"+send_v+"\nsqr:"+sqr.toString()+"\ne:"+e.toString());
                 }
                 Log.i("sendrequest_info","sqr_info:"+sqr.tx.toString()+"\nTxInfo:"+sqr.tx.getTxId().toString());
-                kit.wallet().commitTx(sqr.tx);
-                kit.peerGroup().broadcastTransaction(sqr.tx).broadcast();
+//                kit.wallet().commitTx(sqr.tx);
+//                kit.peerGroup().broadcastTransaction(sqr.tx).broadcast();
             }
         });
     }
@@ -113,15 +135,30 @@ public class multi extends AppCompatActivity {
         long t2=1585623701;
         String s3="fury odor city place orient void radar goose daring topic source cement";
         long t3=1585627015;
+        String s4="junior loop wet fat manage crawl egg vital derive scrub muscle believe";
+        long t4=1585964485;
+        String s5="liquid village follow pigeon banner eternal logic adapt forest jelly buyer case";
+        long t5=1585964531;
+        String s6="warm fire artefact foam lift finish such lizard spatial attend voyage agree";
+        long t6=1585964553;
         try{
             seed_one=new DeterministicSeed(s1,null,"",t1);
             key_one= DeterministicKeyChain.builder().seed(seed_one).build();
             seed_two=new DeterministicSeed(s2,null,"",t2);
             key_two= DeterministicKeyChain.builder().seed(seed_two).build();
-            m= MarriedKeyChain.builder().seed(seed_one)
-                    .followingKeys(key_two.getWatchingKey().dropPrivateBytes().dropParent())
-                    .threshold(2)
-                    .build();
+            seed3=new DeterministicSeed(s3,null,"",t3);
+            key3= DeterministicKeyChain.builder().seed(seed3).build();
+            seed4=new DeterministicSeed(s4,null,"",t4);
+            key4= DeterministicKeyChain.builder().seed(seed4).build();
+            seed5=new DeterministicSeed(s5,null,"",t5);
+            key5= DeterministicKeyChain.builder().seed(seed5).build();
+            seed6=new DeterministicSeed(s6,null,"",t6);
+            key6= DeterministicKeyChain.builder().seed(seed6).build();
+//            MarriedKeyChain.builder().s
+//            m= MarriedKeyChain.builder().seed(seed_one)
+//                    .followingKeys(key_two.getWatchingKey().dropPrivateBytes().dropParent(),key3.getWatchingKey().dropPrivateBytes().dropParent())
+//                    .threshold(3)
+//                    .build();
         }
         catch(UnreadableWalletException e)
         {
@@ -137,7 +174,6 @@ public class multi extends AppCompatActivity {
                 kit = new WalletAppKit(network, new File(getCacheDir()+""), name);
                 kit.startAsync();
                 kit.awaitRunning();
-                kit.wallet().addAndActivateHDChain(m);
                 cus=new CustomTransactionSigner() {
                     @Override
                     protected SignatureAndKey getSignature(Sha256Hash sha256Hash, List<ChildNumber> list) {
@@ -153,8 +189,39 @@ public class multi extends AppCompatActivity {
                     }
                 };
                 kit.wallet().addTransactionSigner(cus);
+                cus=new CustomTransactionSigner() {
+                    @Override
+                    protected SignatureAndKey getSignature(Sha256Hash sha256Hash, List<ChildNumber> list) {
+                        DeterministicKey from_k2=key3.getKeyByPath(list,Boolean.TRUE);
+                        try{
+                            SignatureAndKey result=new SignatureAndKey(ECKey.ECDSASignature.decodeFromDER(from_k2.sign(sha256Hash).encodeToDER()),ECKey.fromPrivate(from_k2.getPrivKey()));
+                            return result;
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                };
+                kit.wallet().addTransactionSigner(cus);
+//                Log.i("wallet",kit.wallet().currentReceiveAddress().getOutputScriptType().toString());
+//                if(!kit.wallet().currentReceiveAddress().getOutputScriptType().toString().contentEquals("P2SH"))
+//                    kit.wallet().freshReceiveAddress();
+//                kit.startAsync();
+//                kit.awaitRunning();
             }
         }).start();
+//        while(1==1)
+//        {
+//            try{
+//                kit.wallet().addAndActivateHDChain(m);
+//                kit.wallet().freshReceiveAddress();
+//                break;
+//            }catch(Exception e)
+//            {
+//                continue;
+//            }
+//        }
     }
     protected void print_Unspent()
     {

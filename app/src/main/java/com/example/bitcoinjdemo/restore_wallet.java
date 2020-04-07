@@ -2,57 +2,73 @@ package com.example.bitcoinjdemo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.bitcoinj.wallet.DeterministicSeed;
+import org.bitcoinj.wallet.UnreadableWalletException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class creat_config extends AppCompatActivity {
-    EditText wallet_name;
-    Switch network,mul_sig;
-    Button create_wallet;
+public class restore_wallet extends AppCompatActivity {
+    protected EditText wallet_name,seed_string,seed_time;
+    protected Switch network,sin_mul;
+    protected Button restore;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.config_wallet);
-        init_window();
+        setContentView(R.layout.load_seed_config);
+        init_view();
     }
-    protected void init_window()
+    protected void init_view()
     {
-        wallet_name=(EditText)findViewById(R.id.config_wallet_name);
-        network=(Switch)findViewById(R.id.config_wallet_network);
-        mul_sig=(Switch)findViewById(R.id.config_wallet_mulsig);
-        create_wallet=(Button)findViewById(R.id.config_creat_wallet);
-        create_wallet.setOnClickListener(new View.OnClickListener() {
+        wallet_name=(EditText)findViewById(R.id.editText3);
+        seed_string=(EditText)findViewById(R.id.editText);
+        seed_time=(EditText)findViewById(R.id.editText2);
+        network=(Switch)findViewById(R.id.restore_network);
+        sin_mul=(Switch)findViewById(R.id.restore_mulsig);
+        restore=(Button)findViewById(R.id.restore_from_seed);
+        seed_string.setText("alien object innocent empty rebel bean better wet pizza middle merry wrap");
+        seed_time.setText("1585925305");
+        restore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name=String.valueOf(wallet_name.getText());
+                String seed_word=String.valueOf(seed_string.getText());
+                String seed_t=String.valueOf(seed_time.getText());
                 if(TextUtils.isEmpty(name))
                 {
-                    Toast toast = Toast.makeText(creat_config.this,"名称不能为空",Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(restore_wallet.this,"名称不能为空",Toast.LENGTH_LONG);
                     toast.show();
                 }
                 else
                 {
+                    try
+                    {
+                        new DeterministicSeed(seed_word,null,"",Long.valueOf(seed_t));
+                    } catch (UnreadableWalletException e) {
+                        Toast toast = Toast.makeText(restore_wallet.this,e.getMessage(),Toast.LENGTH_LONG);
+                        toast.show();
+                        return;
+                    }
                     List<String> s=getFilesAllName();
                     Iterator i=s.iterator();
                     Boolean Testnet=Boolean.FALSE;
                     Boolean Mul_sig=Boolean.FALSE;
                     Intent intent=new Intent();
+                    intent.putExtra("word",seed_word);
+                    intent.putExtra("time",seed_t);
                     if(network.isChecked())
                     {
                         intent.putExtra("testnet","1");
@@ -63,15 +79,15 @@ public class creat_config extends AppCompatActivity {
                         intent.putExtra("testnet","0");
                         name=name+"_main";
                     }
-                    if(mul_sig.isChecked())
+                    if(sin_mul.isChecked())
                     {
                         //ToDo:add some new features
-                        intent.setClass(creat_config.this,pre_multi.class);
+                        intent.setClass(restore_wallet.this,multi.class);
                         name=name+"_multi";
-//                        return;
+                        return;
                     }
                     else{
-                        intent.setClass(creat_config.this,single.class);
+                        intent.setClass(restore_wallet.this,single.class);
                         name=name+"_single";
                     }
                     while(i.hasNext())
@@ -79,19 +95,18 @@ public class creat_config extends AppCompatActivity {
                         String tmp=(String)i.next();
                         if(tmp.contains(name+".wallet"))
                         {
-                            Toast toast = Toast.makeText(creat_config.this,"已存在同名钱包",Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(restore_wallet.this,"已存在同名钱包",Toast.LENGTH_LONG);
                             toast.show();
                             return;
                         }
                     }
+                    intent.putExtra("mode","restore");
                     intent.putExtra("name",name);
-                    intent.putExtra("mode","creat");
                     startActivity(intent);
                 }
             }
         });
     }
-
     public List<String> getFilesAllName() {
         File file=new File (getCacheDir()+"");
         File[] files=file.listFiles();

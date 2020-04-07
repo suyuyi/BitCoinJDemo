@@ -3,6 +3,7 @@ package com.example.bitcoinjdemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,34 +53,86 @@ public class load_config extends AppCompatActivity {
                     List<String> s=getFilesAllName();
                     Iterator i=s.iterator();
                     Boolean find_name=Boolean.FALSE;
+                    Boolean Testnet=Boolean.FALSE;
+                    Boolean Mul_sig=Boolean.FALSE;
+                    Intent intent=new Intent();
+                    intent.putExtra("mode","load");
+                    if(network.isChecked())
+                    {
+                        intent.putExtra("testnet","1");
+                        name=name+"_test";
+                    }
+                    else
+                    {
+                        intent.putExtra("testnet","0");
+                        name=name+"_main";
+                    }
+                    if(mulsig.isChecked())
+                    {
+                        //ToDo:add some new features
+                        intent.setClass(load_config.this,multi_v2.class);
+                        name=name+"_multi";
+//                        return;
+                        String filepath=getCacheDir().getPath()+"/"+name+".json";
+                        try {
+                            FileInputStream ip=new FileInputStream(filepath);
+                            JsonReader jsr=new JsonReader((new InputStreamReader(ip,"UTF-8")));
+                            jsr.beginObject();
+                            while(jsr.hasNext())
+                            {
+                                if(jsr.nextName().equals("key_cnt"))
+                                {
+                                    intent.putExtra("key_cnt",jsr.nextString());
+                                }
+                                if(jsr.nextName().equals("threshold"))
+                                {
+                                   intent.putExtra("threshold",jsr.nextString());
+                                }
+                            }
+                            jsr.endObject();
+                            jsr.close();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                            return;
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                            return;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    else{
+                        intent.setClass(load_config.this,single.class);
+                        name=name+"_single";
+                    }
+                    intent.putExtra("name",name);
+//                    if("test".contentEquals("test"))
+//                        Log.i("load_info","equal");
+//                    else
+//                        Log.i("load_info","not equal");
                     while(i.hasNext())
                     {
                         String tmp=(String)i.next();
+                        Log.i("load_info","tmp:"+tmp+"\nname:"+name);
                         if(tmp.contains(name+".wallet"))
                         {
                             find_name=Boolean.TRUE;
+                            Log.i("load_info","tmp:"+tmp+"\nname:"+name);
                             break;
+//                            return;
                         }
                     }
-                    if(find_name=Boolean.FALSE)
+                    if(find_name==Boolean.TRUE)
                     {
+//                        Log.i("load_info","load succ"+name);
+                        startActivity(intent);
+                    }
+                    else {
                         Toast toast = Toast.makeText(load_config.this,"不存在同名钱包",Toast.LENGTH_LONG);
                         toast.show();
                         return;
                     }
-                    Boolean Testnet=Boolean.FALSE;
-                    Boolean Mul_sig=Boolean.FALSE;
-                    Intent intent=new Intent();
-                    intent.putExtra("name",name);
-                    if(network.isChecked())
-                        intent.putExtra("testnet","1");
-                    else
-                        intent.putExtra("testnet","0");
-                    if(mulsig.isChecked())
-                        intent.setClass(load_config.this,multi.class);
-                    else
-                        intent.setClass(load_config.this,single.class);
-                    startActivity(intent);
                 }
             }
         });

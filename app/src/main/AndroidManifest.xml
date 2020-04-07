@@ -16,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".multi">
+<!--        <activity android:name=".pre_multi">-->
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,7 +28,9 @@
         <activity android:name=".scan_qrcode"/>
         <activity android:name=".show_all_tx"/>
         <activity android:name=".single"/>
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".multi_v2"/>
+        <activity android:name=".pre_multi"/>
+        <activity android:name=".restore_wallet"/>
         <activity android:name=".creat_config"/>
         <activity android:name=".load_config"/>
     </application>
