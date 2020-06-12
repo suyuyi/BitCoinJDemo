@@ -157,10 +157,12 @@ public class single<onStop> extends AppCompatActivity{
                         return;
                     }
                     SendRequest request = SendRequest.to(send_address, coin_amount);
+                    request.feePerKb=Coin.ZERO;
                     try{
                         kit.wallet().completeTx(request);
                     }
                     catch (InsufficientMoneyException e) {
+                        Log.i("IME",e.toString());
                         Toast toast = Toast.makeText(single.this,"余额不足",Toast.LENGTH_LONG);
                         toast.show();
                         return;
@@ -247,6 +249,7 @@ public class single<onStop> extends AppCompatActivity{
                 sync_info.setText(day.toString());
                 balance_info.setText(balance.toFriendlyString());
                 receive_address.setText(rece_addr.toString());
+                Log.i("wallet_info",kit.wallet().toString());
                 Log.i("receive_addr", rece_addr.toString());
                 fee.setText("fee:" + Transaction.DEFAULT_TX_FEE.toFriendlyString());
                 Collection<Transaction> pending = kit.wallet().getPendingTransactions();

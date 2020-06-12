@@ -2,14 +2,16 @@
 
 buildscript {
     repositories {
-//        mavenLocal()
-//        maven{url "http://maven.aliyun.com/nexus/content/groups/public"}
-//        maven{url "https://repo.spring.io/libs-release"}
-//        maven{url "https://repo.spring.io/milestone"}
+//        mavenCentral()
+//        google()
+//        jcenter()
+        //google()
+        //jcenter()
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+        mavenLocal()
         mavenCentral()
-        google()
-        jcenter()
-        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -22,14 +24,16 @@ buildscript {
 
 allprojects {
     repositories {
-//        mavenLocal()
-//        maven{url "http://maven.aliyun.com/nexus/content/groups/public"}
-//        maven{url "https://repo.spring.io/libs-release"}
-//        maven{url "https://repo.spring.io/milestone"}
-        mavenCentral()
-        google()
-        jcenter()
+//        mavenCentral()
+//        google()
+//        jcenter()
+        //google()
+        //jcenter()
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google/'}
+        maven { url 'https://maven.aliyun.com/repository/jcenter/'}
         mavenLocal()
+        mavenCentral()
     }
 
 }

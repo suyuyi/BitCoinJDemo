@@ -432,6 +432,7 @@ public class multi_v2<onStop> extends AppCompatActivity{
                 receive_address.setText(rece_addr.toString());
                 Log.i("receive_addr", rece_addr.toString());
                 Log.i("signer_cnt", String.valueOf(kit.wallet().getTransactionSigners().size()));
+                Log.i("wallet_info",kit.wallet().toString());
                 fee.setText("fee:" + Transaction.DEFAULT_TX_FEE.toFriendlyString());
                 Collection<Transaction> pending = kit.wallet().getPendingTransactions();
 //                List<Transaction> pending = kit.wallet().getRecentTransactions(1,Boolean.FALSE);
@@ -495,6 +496,7 @@ public class multi_v2<onStop> extends AppCompatActivity{
         builder.create().show();
     }
     private void show_str_seed() {
+        Log.i("seed_info","助记词:"+kit.wallet().getKeyChainSeed().getMnemonicCode().toString()+"\n时间盐:"+String.valueOf(kit.wallet().getKeyChainSeed().getCreationTimeSeconds()));
         builder = new AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle("请勿向他人展示助记词")
                 .setMessage("助记词:"+kit.wallet().getKeyChainSeed().getMnemonicCode().toString()+"\n时间盐:"+String.valueOf(kit.wallet().getKeyChainSeed().getCreationTimeSeconds()))
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {

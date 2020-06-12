@@ -59,40 +59,6 @@ public class pre_multi extends AppCompatActivity {
         }
         else if(intent.getStringExtra("mode").contentEquals("load"))
         {
-//            Intent load_intent=new Intent();
-//            load_intent.putExtra("name",getIntent().getStringExtra("name"));
-//            load_intent.putExtra("mode",getIntent().getStringExtra("mode"));
-//            load_intent.setClass(pre_multi.this,multi_v2.class);
-//            String filepath=getCacheDir().getPath()+"/"+getIntent().getStringExtra("name")+".json";
-//            try {
-//                FileInputStream ip=new FileInputStream(filepath);
-//                JsonReader jsr=new JsonReader((new InputStreamReader(ip,"UTF-8")));
-//                jsr.beginObject();
-//                while(jsr.hasNext())
-//                {
-//                    if(jsr.nextName().equals("key_cnt"))
-//                    {
-//                        load_intent.putExtra("key_cnt",jsr.nextString());
-//                    }
-//                    if(jsr.nextName().equals("threshold"))
-//                    {
-//                        load_intent.putExtra("threshold",jsr.nextString());
-//                    }
-//                    if(jsr.nextName().equals("testnet"))
-//                    {
-//                        load_intent.putExtra("testnet",jsr.nextString());
-//                    }
-//                }
-//                jsr.endObject();
-//                jsr.close();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            startActivity(load_intent);
         }
         else if(intent.getStringExtra("mode").contentEquals("restore"))
         {
@@ -102,7 +68,59 @@ public class pre_multi extends AppCompatActivity {
             load_intent.putExtra("mode",getIntent().getStringExtra("mode"));
             load_intent.putExtra("word",getIntent().getStringExtra("word"));
             load_intent.putExtra("time",getIntent().getStringExtra("time"));
+            String name=getIntent().getStringExtra("name");
+            String filepath=getCacheDir().getPath()+"/"+name+".json";
+            String key_cnt=null,threshold=null;
+            try {
+                FileInputStream ip=new FileInputStream(filepath);
+                JsonReader jsr=new JsonReader((new InputStreamReader(ip,"UTF-8")));
+                jsr.beginObject();
+                while(jsr.hasNext())
+                {
+                    if(jsr.nextName().equals("key_cnt"))
+                    {
+                        key_cnt=jsr.nextString();
+                    }
+                    if(jsr.nextName().equals("threshold"))
+                    {
+                        threshold=jsr.nextString();
+                    }
+                }
+                jsr.endObject();
+                jsr.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast toast = Toast.makeText(pre_multi.this,"相关多重签名钱包备份文件不存在",Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                Toast toast = Toast.makeText(pre_multi.this,"相关多重签名钱包备份文件编码错误",Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast toast = Toast.makeText(pre_multi.this,"相关多重签名钱包备份文件读取错误",Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            }
+            if(network==MainNetParams.get())
+                load_intent.putExtra("testnet","0");
+            else
+                load_intent.putExtra("testnet","1");
+            load_intent.putExtra("threshold",threshold);
+            load_intent.putExtra("key_cnt",key_cnt);
+            int i=1;
+            Iterator tky=followingkey.iterator();
+            while(i<=Integer.valueOf(threshold)&&tky.hasNext())
+            {
 
+                DeterministicKey tmp=(DeterministicKey)tky.next();
+                load_intent.putExtra("followingkey"+String.valueOf(i),tmp.serializePubB58(network));
+                i++;
+            }
+            load_intent.setClass(pre_multi.this,multi_v2.class);
+            startActivity(load_intent);
         }
     }
     protected void init_view_creat()
@@ -142,16 +160,6 @@ public class pre_multi extends AppCompatActivity {
                     intent_mul.putExtra("testnet","1");
                 intent_mul.putExtra("threshold",String.valueOf(key_thr));
                 intent_mul.putExtra("key_cnt",String.valueOf(key_cnt));
-//                ToDo:test
-//                intent_mul.putExtra("name","test_test_multi");
-//                intent_mul.putExtra("mode","creat");
-//                intent_mul.putExtra("testnet","1");
-//                network=TestNet3Params.get();
-//                intent_mul.putExtra("threshold","2");
-//                intent_mul.putExtra("key_cnt","3");
-//                DeterministicSeed main_seed=key_one.getSeed();
-//                ArrayList<String> word_list=(ArrayList<String>) main_seed.getMnemonicCode();
-//                intent_mul.putExtra("seed_word",key_one.getWatchingKey().s)
                 int i=1;
                 Iterator tky=followingkey.iterator();
                 while(i<=key_thr&&tky.hasNext())

@@ -76,13 +76,14 @@ public class multi extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try{
-                    Log.i("wallet_info",kit.wallet().getActiveKeyChain().toString());
+//                    Log.i("wallet_info",kit.wallet().getActiveKeyChain().toString());
 //                DeterministicKeyChain k;
 //                Log.i("mul_mess","Signer_num:"+String.valueOf(kit.wallet().getTransactionSigners().size()));
-//                print_redeemdata();
+                    print_redeemdata();
                     print_Unspent();
                     Log.i("wallet_info",kit.wallet().toString());
                     Log.i("wallet_info",kit.wallet().getTransactionsByTime().toString());
+                    Log.i("receive_addr",kit.wallet().currentReceiveAddress().toString());
                     Log.i("key_info","seed_word:"+kit.wallet().getActiveKeyChain().getSeed().getMnemonicCode().toString()+
                             "\nseed_time:"+kit.wallet().getActiveKeyChain().getSeed().getCreationTimeSeconds());
                 }
@@ -123,8 +124,8 @@ public class multi extends AppCompatActivity {
                     Log.i("sendrequest_info","spent_value:"+send_v+"\nsqr:"+sqr.toString()+"\ne:"+e.toString());
                 }
                 Log.i("sendrequest_info","sqr_info:"+sqr.tx.toString()+"\nTxInfo:"+sqr.tx.getTxId().toString());
-//                kit.wallet().commitTx(sqr.tx);
-//                kit.peerGroup().broadcastTransaction(sqr.tx).broadcast();
+                kit.wallet().commitTx(sqr.tx);
+                kit.peerGroup().broadcastTransaction(sqr.tx).broadcast();
             }
         });
     }
@@ -154,11 +155,11 @@ public class multi extends AppCompatActivity {
             key5= DeterministicKeyChain.builder().seed(seed5).build();
             seed6=new DeterministicSeed(s6,null,"",t6);
             key6= DeterministicKeyChain.builder().seed(seed6).build();
-//            MarriedKeyChain.builder().s
-//            m= MarriedKeyChain.builder().seed(seed_one)
-//                    .followingKeys(key_two.getWatchingKey().dropPrivateBytes().dropParent(),key3.getWatchingKey().dropPrivateBytes().dropParent())
-//                    .threshold(3)
-//                    .build();
+//            MarriedKeyChain.builder().
+            m= MarriedKeyChain.builder().seed(seed_one)
+                    .followingKeys(key_two.getWatchingKey().dropPrivateBytes().dropParent(),key3.getWatchingKey().dropPrivateBytes().dropParent())
+                    .threshold(2)
+                    .build();
         }
         catch(UnreadableWalletException e)
         {
@@ -204,6 +205,13 @@ public class multi extends AppCompatActivity {
                     }
                 };
                 kit.wallet().addTransactionSigner(cus);
+                cus=new CustomTransactionSigner() {
+                    @Override
+                    protected SignatureAndKey getSignature(Sha256Hash sha256Hash, List<ChildNumber> list) {
+                        return null;
+                    }
+                };
+                kit.wallet().addTransactionSigner(cus);
 //                Log.i("wallet",kit.wallet().currentReceiveAddress().getOutputScriptType().toString());
 //                if(!kit.wallet().currentReceiveAddress().getOutputScriptType().toString().contentEquals("P2SH"))
 //                    kit.wallet().freshReceiveAddress();
@@ -211,17 +219,17 @@ public class multi extends AppCompatActivity {
 //                kit.awaitRunning();
             }
         }).start();
-//        while(1==1)
-//        {
-//            try{
-//                kit.wallet().addAndActivateHDChain(m);
-//                kit.wallet().freshReceiveAddress();
-//                break;
-//            }catch(Exception e)
-//            {
-//                continue;
-//            }
-//        }
+        while(1==1)
+        {
+            try{
+                kit.wallet().addAndActivateHDChain(m);
+                kit.wallet().freshReceiveAddress();
+                break;
+            }catch(Exception e)
+            {
+                continue;
+            }
+        }
     }
     protected void print_Unspent()
     {

@@ -39,8 +39,8 @@ public class restore_wallet extends AppCompatActivity {
         network=(Switch)findViewById(R.id.restore_network);
         sin_mul=(Switch)findViewById(R.id.restore_mulsig);
         restore=(Button)findViewById(R.id.restore_from_seed);
-        seed_string.setText("alien object innocent empty rebel bean better wet pizza middle merry wrap");
-        seed_time.setText("1585925305");
+        seed_string.setText("place all now offer traffic extend cream gown basket crane hybrid sweet");
+        seed_time.setText("1588488265");
         restore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,9 +82,9 @@ public class restore_wallet extends AppCompatActivity {
                     if(sin_mul.isChecked())
                     {
                         //ToDo:add some new features
-                        intent.setClass(restore_wallet.this,multi.class);
+                        intent.setClass(restore_wallet.this,pre_multi.class);
                         name=name+"_multi";
-                        return;
+//                        return;
                     }
                     else{
                         intent.setClass(restore_wallet.this,single.class);

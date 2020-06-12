@@ -93,12 +93,18 @@ public class load_config extends AppCompatActivity {
                             jsr.close();
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
+                            Toast toast = Toast.makeText(load_config.this,"不存在同名钱包",Toast.LENGTH_LONG);
+                            toast.show();
                             return;
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
+                            Toast toast = Toast.makeText(load_config.this,"不存在同名钱包",Toast.LENGTH_LONG);
+                            toast.show();
                             return;
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Toast toast = Toast.makeText(load_config.this,"不存在同名钱包",Toast.LENGTH_LONG);
+                            toast.show();
                             return;
                         }
                     }
