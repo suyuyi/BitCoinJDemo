@@ -63,15 +63,15 @@ BitCoinJDemo是一个基于[BitCoinJ](https://bitcoinj.github.io/)和[ZBar](http
 > ##### 相关界面：activity_single
 #### 开发环境
 > ##### 代码开发环境如下：
-> Android Studio 3.5.3
-> Build #AI-191.8026.42.35.6010548, built on November 15, 2019
-> JRE: 1.8.0_202-release-1483-b03 amd64
-> JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o
-> Windows 10 10.0
+> Android Studio 3.5.3  
+> Build #AI-191.8026.42.35.6010548, built on November 15, 2019  
+> JRE: 1.8.0_202-release-1483-b03 amd64  
+> JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o  
+> Windows 10 10.0  
 > ##### 软件测试环境如下：
-> 手机型号：Honor 8X
-> Android版本：10
-> EMUI版本：10.0.0
+> 手机型号：Honor 8X  
+> Android版本：10  
+> EMUI版本：10.0.0  
 #### 其他改进方向、思路
 ##### 在多重签名的创建、恢复过程中存在改进之处
 > 关于交易的实现部分依赖于BitCoinJ库，该库使用过程如下：
