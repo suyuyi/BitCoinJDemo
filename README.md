@@ -76,6 +76,10 @@ BitCoinJDemo是一个基于[BitCoinJ](https://bitcoinj.github.io/)和[ZBar](http
 > 手机型号：Honor 8X  
 > Android版本：10  
 > EMUI版本：10.0.0  
+## 代码实现的关键算法
+本项目代码仅为功能实现，暂时并未使用特别的算法，性能优化以及其他底层的算法都由使用的工具库实现，其中需要注意的是在实现多重签名的过程中会涉及到混合密钥(MarriedKeyChain)的生成问题，这里用到了一个[限定生成顺序的算法](https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/wallet/MarriedKeyChain.java)，后续改进和优化时可能需要具体留意
+## Q & A
+暂无
 ## 其他改进方向、思路
 ### 在多重签名的创建、恢复过程中存在改进之处
 > 关于交易的实现部分依赖于BitCoinJ库，该库使用过程如下：
