@@ -53,26 +53,31 @@ BitCoinJDemo是一个基于[BitCoinJ](https://bitcoinj.github.io/)和[ZBar](http
 > * refreshMSG（定期刷新余额、同步进度等信息）
 > * showTwo（send发送时进一步要求用户确认）
 > * show_loading（在钱包初始化的过程中相关点击按钮已经创建，但其函数调用的实体可能还未创建完毕，因此此时如果点击按钮会导致程序崩溃，所以最初几秒内会出现初始化界面防止用户点击）
-> ##### 函数接口：通过intent以键值对形式传递参数，其全部参数为：name、mode、testnet（word、time）
+> ##### 函数接口：通过intent以键值对形式传入参数，其全部参数为：name、mode、testnet（word、time）
 > ##### 相关界面：activity_single
 #### multi_v2
 > ##### 函数功能
 > 该函数为多重签名钱包的主要实现模块，可以通过mode的不同来执行不同的模式，其接收name、mode、testnet、key_cnt、 followingkey、threshold（如果mode：restore的话还需包含word、time）参数，其基本过程与single相似——此前的single模块管理一个密钥串，而多重签名则管理着一个由多个密钥混合生成的密钥串，由于本项目仅为功能展示，因此候选密钥的顺序是固定的（与pre_multi中生成的密钥一致），因此根据传入的密钥数量就可判断用到了哪些密钥，并以此为基础生成混合密钥链同时在本地添加TransactionSigner（BitCoinJ自带的类，可以在send的过程中被调用签名）以便于后续的支付，而完成混合密钥生成与Signer添加后，其运行过程与上述单签名钱包(single)相同
 > ##### 函数接口：通过intent以键值对形式传递参数，其全部参数为：name、mode、testnet、key_cnt、 followingkey、threshold
 > ##### 相关界面：activity_single
-#### 开发环境
-> ##### 代码开发环境如下：
+## 相关科研项目、论文
+代码主要为《基于智能手机的多重签名比特币钱包调研及实现》这一论文的实现部分，该论文由比特币钱包技术综述和实现组成。本项目的主要目的在于实现一个能在智能手机上运行的多重签名比特币钱包，因此需要做到同步速度快、占用空间小、使用灵活的特点。  
+本项目调研了当前比特币钱包存在的问题同时通过实现当前较为热门的多重签名比特币钱包，对于当前比特币钱包的不足和改进方向做出了自己的建议。
+## 实验设计
+该代码主要为功能实现，暂时不涉及相关实验
+## 开发环境
+> ### 代码开发环境如下：
 > Android Studio 3.5.3  
 > Build #AI-191.8026.42.35.6010548, built on November 15, 2019  
 > JRE: 1.8.0_202-release-1483-b03 amd64  
 > JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o  
 > Windows 10 10.0  
-> ##### 软件测试环境如下：
+> ### 软件测试环境如下：
 > 手机型号：Honor 8X  
 > Android版本：10  
 > EMUI版本：10.0.0  
-#### 其他改进方向、思路
-##### 在多重签名的创建、恢复过程中存在改进之处
+## 其他改进方向、思路
+### 在多重签名的创建、恢复过程中存在改进之处
 > 关于交易的实现部分依赖于BitCoinJ库，该库使用过程如下：
 > * 在一个线程中创建WalletAppKit类，该类包含比特币钱包所需要的全部功能，只需要将参数（network、name）配置好即可，随后使用类内部的startAsync()开始同步
 > * 同步完毕后可以调用balance等查看当前钱包余额
