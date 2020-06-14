@@ -54,10 +54,33 @@ BitCoinJDemo是一个基于[BitCoinJ](https://bitcoinj.github.io/)和[ZBar](http
 > * refreshMSG（定期刷新余额、同步进度等信息）
 > * showTwo（send发送时进一步要求用户确认）
 > * show_loading（在钱包初始化的过程中相关点击按钮已经创建，但其函数调用的实体可能还未创建完毕，因此此时如果点击按钮会导致程序崩溃，所以最初几秒内会出现初始化界面防止用户点击）
-> ##### 函数接口：通过intent以键值对形式传递参数，其全部参数为：name、mode、testnet
+> ##### 函数接口：通过intent以键值对形式传递参数，其全部参数为：name、mode、testnet（word、time）
 > ##### 相关界面：activity_single
 #### multi_v2
 > ##### 函数功能
 > 该函数为多重签名钱包的主要实现模块，可以通过mode的不同来执行不同的模式，其接收name、mode、testnet、key_cnt、 followingkey、threshold（如果mode：restore的话还需包含word、time）参数，其基本过程与single相似——此前的single模块管理一个密钥串，而多重签名则管理着一个由多个密钥混合生成的密钥串，由于本项目仅为功能展示，因此候选密钥的顺序是固定的（与pre_multi中生成的密钥一致），因此根据传入的密钥数量就可判断用到了哪些密钥，并以此为基础生成混合密钥链同时在本地添加TransactionSigner（BitCoinJ自带的类，可以在send的过程中被调用签名）以便于后续的支付，而完成混合密钥生成与Signer添加后，其运行过程与上述单签名钱包(single)相同
 > ##### 函数接口：通过intent以键值对形式传递参数，其全部参数为：name、mode、testnet、key_cnt、 followingkey、threshold
 > ##### 相关界面：activity_single
+#### 开发环境
+> ##### 代码开发环境如下：
+> Android Studio 3.5.3
+> Build #AI-191.8026.42.35.6010548, built on November 15, 2019
+> JRE: 1.8.0_202-release-1483-b03 amd64
+> JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o
+> Windows 10 10.0
+> ##### 软件测试环境如下：
+> 手机型号：Honor 8X
+> Android版本：10
+> EMUI版本：10.0.0
+#### 其他改进方向、思路
+##### 在多重签名的创建、恢复过程中存在改进之处
+> 关于交易的实现部分依赖于BitCoinJ库，该库使用过程如下：
+> * 在一个线程中创建WalletAppKit类，该类包含比特币钱包所需要的全部功能，只需要将参数（network、name）配置好即可，随后使用类内部的startAsync()开始同步
+> * 同步完毕后可以调用balance等查看当前钱包余额
+> * 当需要花费余额是，直接构造包含金额和目标地址的SendRequest类
+> * 调用kit.wallet().commitTx(request.tx)，该函数会从余额中挑选出符合要求的未花费输出并自动完成签名
+> * 调用广播函数 kit.peerGroup().broadcastTransaction(request.tx).broadcast();将交易广播至全网，随后等待交易上链即可
+> 在这一过程中如果发生余额不足、交易失败等情况commitTx函数会弹出相关错误代码，据此可以弹出Toast来告知用户相关错误，多重签名钱包的交易过程也与此类似,但问题在于：单签名钱包只与当前用户相关，因此无论是其密钥只与当前用户有关，恢复过程只需恢复单个密钥即可，签名同样如此。
+> 而多重签名则不同，用户记忆的助记词等信息只与其自己的密钥有关，而钱包所用的密钥实际上是用户自己的密钥和其他密钥共同生成的混合密钥，因此在恢复过程中除了恢复自己的密钥还需要得到其他用户的公钥，而在签名过程中除了使用自己的密钥签名，还需要将sendrequest交给其他用户签名，最终合并这些签名使其数量超过threshold才能完成交易。
+> 本项目对于这部分的实现并不完整：通过在本地存储一连串的密钥（multi_v2中的init_cus_key()、pre_multi中的init_key()）在配置时根据所需密钥的数量传入相应的密钥，而在签名时同样根据相关数量来挨个使用密钥签名。
+> 因此如果后续进行改进，将多重签名的相关功能搬到线上，那么需要对pre_multi进行改动，使其传入multi_v2的followingkey来自于切实的其他用户，同时multi_v2中的TransactionSigner的添加也需要进行改动，使其确实与其他节点发生联系并收到其他节点传回的签名，同时对于多重签名的恢复也需要做出改进，需要将用户助记词、时间与相关配置（密钥数量、所需最少签名数量）进行结合，而不是一个简单的本地json文件。
