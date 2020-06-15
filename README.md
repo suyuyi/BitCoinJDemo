@@ -72,6 +72,8 @@ BitCoinJDemo是一个基于[BitCoinJ](https://bitcoinj.github.io/)和[ZBar](http
 > JRE: 1.8.0_202-release-1483-b03 amd64  
 > JVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o  
 > Windows 10 10.0  
+> targetSdkVersion 28(Android Pie)
+> compileSdkVersion 28(Android Pie)
 > ### 软件测试环境如下：
 > 手机型号：Honor 8X  
 > Android版本：10  
