@@ -20,7 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+// 为创建钱包配置相关输入，用户需要选择钱包类型（单 or 多签名）、存储文件名称、比特币网络
+// 经过一定处理后通过intent(mode,name,testnet)的形式传入后续活动
 public class creat_config extends AppCompatActivity {
     EditText wallet_name;
     Switch network,mul_sig;
@@ -53,6 +54,8 @@ public class creat_config extends AppCompatActivity {
                     Boolean Testnet=Boolean.FALSE;
                     Boolean Mul_sig=Boolean.FALSE;
                     Intent intent=new Intent();
+                    // 此处对用户输入的名称添加后缀，这使得可以出现类型不同但命名相同的钱包
+                    // 但如果类型、网络、命名都相同则会判违法，需要重新输入
                     if(network.isChecked())
                     {
                         intent.putExtra("testnet","1");
@@ -77,6 +80,9 @@ public class creat_config extends AppCompatActivity {
                     while(i.hasNext())
                     {
                         String tmp=(String)i.next();
+                        // 需要注意的是此处只检查是否存在.wallet文件，而不检查json文件，而后者时存储多重签名钱包配置的文件
+                        // 也就是说，如果用户丢失了多签名钱包文件，但未使用restore而直接使用creat同时其配置完全相同，那么
+                        // 后续的pre_multi的配置中会出现问题，因为已经有一个json文件存在了，后续可能需要对此做出限制
                         if(tmp.contains(name+".wallet"))
                         {
                             Toast toast = Toast.makeText(creat_config.this,"已存在同名钱包",Toast.LENGTH_LONG);

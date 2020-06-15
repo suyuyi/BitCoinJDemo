@@ -42,7 +42,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bitcoinjdemo.ser_Info_tx_list;
-
+// 本模块为单签名钱包的实现
+// 其输入为intent(mode, name ,testnet, (word,time))
+// 其中mode代表当前请求的模式，钱包根据模式进行不同的处理
 public class single<onStop> extends AppCompatActivity{
     protected WalletAppKit kit;
     protected NetworkParameters network;
@@ -62,6 +64,7 @@ public class single<onStop> extends AppCompatActivity{
         Intent single= getIntent();
         wallet_name=single.getStringExtra("name");
         mode=single.getStringExtra("mode");
+        // mode==restore,根据助记词及时间恢复密钥
         if(mode.contains("restore"))
         {
             try
@@ -87,6 +90,7 @@ public class single<onStop> extends AppCompatActivity{
     }
     private void start_wallet(String name,NetworkParameters network,String mode){
         new Thread(new Runnable() {
+            // 开辟线程并在其中启动钱包，钱包会开始同步数据，同时可以实现钱包与主进程的交互
             @Override
             public void run() {
                 kit = new WalletAppKit(network, new File(getCacheDir()+""), name);
@@ -113,6 +117,7 @@ public class single<onStop> extends AppCompatActivity{
         show_seed=(Button)findViewById(R.id.show_seed);
         show_all=(Button)findViewById(R.id.show_all);
         time_record=Boolean.FALSE;
+        // 接收地址二维码展示
         receive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,6 +126,7 @@ public class single<onStop> extends AppCompatActivity{
                 startActivity(show_QRcode);
             }
         });
+        // 扫描二维码调用
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,6 +134,7 @@ public class single<onStop> extends AppCompatActivity{
                 startActivityForResult(scan_QRcode,1);
             }
         });
+        // 发送请求
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -156,8 +163,11 @@ public class single<onStop> extends AppCompatActivity{
                         toast.show();
                         return;
                     }
+                    // 地址、金额检测合法，开始正式进入支付环节
+                    // 首先构造sendrequest类
                     SendRequest request = SendRequest.to(send_address, coin_amount);
                     request.feePerKb=Coin.ZERO;
+                    // 选择合适的UTXO填入其中
                     try{
                         kit.wallet().completeTx(request);
                     }
@@ -179,12 +189,14 @@ public class single<onStop> extends AppCompatActivity{
 
             }
         });
+        // 展示助记词
         show_seed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 show_str_seed();
             }
         });
+        // 展示交易记录
         show_all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -207,6 +219,7 @@ public class single<onStop> extends AppCompatActivity{
             }
         });
     }
+    // 实时刷新界面当中的同步时间、余额等信息
     private void init_window()
     {
 //        SystemClock.sleep(1000);
@@ -290,6 +303,7 @@ public class single<onStop> extends AppCompatActivity{
             }
         }
     };
+    // 在支付时要求用户进行二次确认
     private void showTwo(SendRequest request) {
         builder = new AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle("请确认发送")
                 .setMessage("发送总计:"+request.tx.getValue(kit.wallet()).toFriendlyString()+"\n其中包含小费:"+request.tx.getFee().toFriendlyString())
@@ -297,6 +311,7 @@ public class single<onStop> extends AppCompatActivity{
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //ToDo: 你想做的事情
+                        // 进行签名并广播
                         kit.wallet().commitTx(request.tx);
                         kit.peerGroup().broadcastTransaction(request.tx).broadcast();
                         send_address.setText("");
@@ -338,7 +353,8 @@ public class single<onStop> extends AppCompatActivity{
 //                });
         builder.create().show();
     }
-
+    // 由于初始化界面的过程中线程中的钱包类可能还未创建完成
+    // 为了防止用户误触相关按钮导致崩溃，调用一段固定时长的动画
     private void showLoading() {
         final int MAX_VALUE = 100;
         progressDialog = new ProgressDialog(single.this);

@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
-
+//主界面，用户通过该界面选择接下来的相关行为：创建、载入、恢复钱包
 public class MainActivity extends AppCompatActivity {
     ImageView title;
     Button creat,load,restore;

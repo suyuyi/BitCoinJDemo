@@ -20,7 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+// 为恢复钱包配置相关输入，用户需要选择钱包类型（单 or 多签名）、存储文件名称、比特币网络以及用于恢复根密钥的助记词、创建时间
+// 经过一定处理后通过intent(mode,name,testnet,word,time)的形式传入后续活动
 public class restore_wallet extends AppCompatActivity {
     protected EditText wallet_name,seed_string,seed_time;
     protected Switch network,sin_mul;

@@ -23,7 +23,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+// 为载入钱包配置相关输入，用户需要选择钱包类型（单 or 多签名）、存储文件名称、比特币网络
+// 随后判断用户请求载入的钱包是否存在
+// 经过一定处理后通过intent(mode,name,testnet)的形式传入后续活动
+// 如果是多重签名比特币钱包，还需要读取json配置，从中获取关于多重密钥的相关信息
 public class load_config extends AppCompatActivity {
     private Button load;
     private Switch mulsig,network;
@@ -113,10 +116,6 @@ public class load_config extends AppCompatActivity {
                         name=name+"_single";
                     }
                     intent.putExtra("name",name);
-//                    if("test".contentEquals("test"))
-//                        Log.i("load_info","equal");
-//                    else
-//                        Log.i("load_info","not equal");
                     while(i.hasNext())
                     {
                         String tmp=(String)i.next();

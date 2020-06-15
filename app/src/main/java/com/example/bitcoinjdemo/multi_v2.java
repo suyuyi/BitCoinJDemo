@@ -56,7 +56,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bitcoinjdemo.ser_Info_tx_list;
-
+// 多重签名比特币钱包的实现，其模式选择、发送处理等大的方面与single的实现完全一致，不同之处在于签名用户的添加和多重密钥相关的一些额外处理
 public class multi_v2<onStop> extends AppCompatActivity{
     protected WalletAppKit kit;
     protected NetworkParameters network;
@@ -97,6 +97,8 @@ public class multi_v2<onStop> extends AppCompatActivity{
             followingkey=new ArrayList<DeterministicKey>();
             for(int i=1;i<=Integer.valueOf(getIntent().getStringExtra("key_cnt"))-1;++i)
             {
+                // 相关的密钥可以在处理后（getWatchingKey()）用deserializeB58与serializePubB58来在函数之间传递
+                // 之后也可以在网络上传递，实现真正的多用户确认而非展示使用的本地确认
                 DeterministicKey tmp=DeterministicKey.deserializeB58(creat_mul.getStringExtra("followingkey"+String.valueOf(i)),network);
                 followingkey.add(tmp);
             }
@@ -162,6 +164,11 @@ public class multi_v2<onStop> extends AppCompatActivity{
         int i=0;
         int threshold=Integer.valueOf(getIntent().getStringExtra("threshold"));
         SystemClock.sleep(1000);
+        // 该过程为多重签名比特币钱包所独有
+        // CustomTransactionSigner是BitCoinJ为实现多重签名所特意添加的一个类
+        // 该类传入一个需要签名的脚本哈希值，以及相关密钥的生成路径，需要输出一个签名后的哈希值和相关公钥
+        // 此前single中所使用的commitTx会在底层自行调用这些被添加的singer并将其返回的签名按照顺序填入赎回脚本中
+        // 如果之后需要实现通过网络传递的实际钱包，则需要在此处添加相关的交流代码
         while(i<threshold-1)
         {
             int j = i;
@@ -193,6 +200,9 @@ public class multi_v2<onStop> extends AppCompatActivity{
                 kit.awaitRunning();
             }
         }).start();
+        // 钱包本质上仍然只使用一个密钥链
+        // 多重密钥的不同在于随后将这一密钥链替换为自己所生成的混合密钥（MarriedKeyChain）
+        // 因为钱包的生成处在线程中所以需要等待一段时间后再添加新的密钥，否则可能会因为地址错误而崩溃
         while(1==1)
         {
             SystemClock.sleep(500);

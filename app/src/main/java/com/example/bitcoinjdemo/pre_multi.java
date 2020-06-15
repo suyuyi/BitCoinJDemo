@@ -31,7 +31,11 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
+//该函数用于配置多重签名比特币钱包的多重签名方面的配置
+// 该函数会接受用户输入的密钥总数(key_cnt)和所需最少签名数(threshold)
+// 并从本地存储的密钥中从第一个开始挑选出合适数量的密钥组成followingkeys
+// 随后与之前intent中传入的(mode,name,testnet,[word,time](可选))一并传入multi_v2
+// 需要注意的是用户目前可输入的最大的key_cnt为3，大于该限制的可能会出现问题
 public class pre_multi extends AppCompatActivity {
     protected EditText key_num,key_threshold;
     protected Button creat_wallet;
@@ -190,59 +194,8 @@ public class pre_multi extends AppCompatActivity {
             }
         });
     }
-
-    protected void init_view_restore()
-    {
-        //ToDo:here we can add information about key_cnt
-        key_num=(EditText)findViewById(R.id.editText5);
-        key_threshold=(EditText)findViewById(R.id.editText6);
-        creat_wallet=(Button)findViewById(R.id.button);
-        creat_wallet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(key_num.getText().toString().isEmpty()||key_threshold.getText().toString().isEmpty())
-                {
-                    Toast toast = Toast.makeText(pre_multi.this,"密钥数量以及下限不能为空",Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-                int key_cnt= Integer.valueOf(key_num.getText().toString());
-                int key_thr=Integer.valueOf(key_threshold.getText().toString());
-                if(key_cnt>6)
-                {
-                    Toast toast = Toast.makeText(pre_multi.this,"密钥数量不可超过6",Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-                if(key_cnt<key_thr)
-                {
-                    Toast toast = Toast.makeText(pre_multi.this,"密钥数量不能小于下限",Toast.LENGTH_LONG);
-                    toast.show();
-                    return;
-                }
-                Intent intent_mul=new Intent();
-                intent_mul.putExtra("name",intent.getStringExtra("name"));
-                intent_mul.putExtra("mode",intent.getStringExtra("mode"));
-                if(network==MainNetParams.get())
-                    intent_mul.putExtra("testnet","0");
-                else
-                    intent_mul.putExtra("testnet","1");
-                intent_mul.putExtra("threshold",String.valueOf(key_thr));
-                intent_mul.putExtra("key_cnt",String.valueOf(key_cnt));
-                int i=1;
-                Iterator tky=followingkey.iterator();
-                while(i<=key_thr-1&&tky.hasNext())
-                {
-
-                    DeterministicKey tmp=(DeterministicKey)tky.next();
-                    intent_mul.putExtra("followingkey"+String.valueOf(i),tmp.serializePubB58(network));
-                    i++;
-                }
-                intent_mul.setClass(pre_multi.this,multi_v2.class);
-                startActivity(intent_mul);
-            }
-        });
-    }
+    // 从给出的例子中挑选合适数量的密钥，由于BitCoinJ中所用到的KeyChain类无法导出存储
+    // 因此使用助记词+时间的方式来还原得到密钥
     protected void init_key(){
         followingkey=new ArrayList<DeterministicKey>();
         String s1="math glare tail staff intact trophy super double cinnamon arch segment sheriff";
