@@ -45,6 +45,8 @@ import com.example.bitcoinjdemo.ser_Info_tx_list;
 // 本模块为单签名钱包的实现
 // 其输入为intent(mode, name ,testnet, (word,time))
 // 其中mode代表当前请求的模式，钱包根据模式进行不同的处理
+// 钱包中的各类接口可以在https://bitcoinj.github.io/javadoc/0.15.7/org/bitcoinj/wallet/Wallet.html中查找具体的用法
+// 上述API的说明文件中存在着其他未被使用的接口，可以在后续的优化环节中使用
 public class single<onStop> extends AppCompatActivity{
     protected WalletAppKit kit;
     protected NetworkParameters network;
